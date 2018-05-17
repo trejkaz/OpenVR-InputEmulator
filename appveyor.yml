@@ -1,0 +1,37 @@
+image: Visual Studio 2015
+
+install:
+  - git submodule update --init --recursive --depth 1
+
+# XXX: Should we be building 32-bit too?
+platform: x64
+
+configuration:
+  - Debug
+  - Release
+
+environment:
+  # Docs said it wanted Qt 5.7, but 5.7 is end of life.
+  QTDIR: C:\Qt\5.9.5\msvc2015_64
+  BOOST_ROOT: C:\Libraries\boost_1_63_0
+  BOOST_LIB: C:\Libraries\boost_1_63_0\lib64-msvc-14.0
+
+build_script:
+  # It's impossible to use the .sln file to build, because client_leapmotion fails to build,
+  # which in turn is because there is no obvious way to automate pulling their SDK down automatically.
+  # So we iterate all the projects that aren't that one.
+  - set FLAGS=/P:Configuration=%CONFIGURATION% /P:Platform=%PLATFORM% /P:BOOST_ROOT=%BOOST_ROOT% /P:BOOST_LIB=%BOOST_LIB% /P:QTDIR=%QTDIR%
+  - msbuild %FLAGS% lib_vrinputemulator\lib_vrinputemulator.vcxproj
+  - msbuild %FLAGS% driver_vrinputemulator\driver_vrinputemulator.vcxproj
+  - msbuild %FLAGS% client_commandline\client_commandline.vcxproj
+  - msbuild %FLAGS% client_overlay\client_overlay.vcxproj
+  # Producing a zip of just the library for projects which depend on it.
+  # TODO: Publishing to NuGet might be better.
+  - cd lib_vrinputemulator
+  - 7z a ..\LibVRInputEmulator-%CONFIGURATION%.zip include\ %CONFIGURATION%\lib\%PLATFORM%\libvrinputemulator.lib
+  - cd ..
+  # TODO: Build above doesn't build the installer. Build process to get an installer is also unclear from docs.
+
+artifacts:
+  - path: LibVRInputEmulator-%CONFIGURATION%.zip
+    name: LibVRInputEmulator

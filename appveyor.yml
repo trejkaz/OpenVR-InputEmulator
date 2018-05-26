@@ -1,4 +1,4 @@
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 install:
   - git submodule update --init --recursive --depth 1
@@ -12,9 +12,9 @@ configuration:
 
 environment:
   # Docs said it wanted Qt 5.7, but 5.7 is end of life.
-  QTDIR: C:\Qt\5.9.5\msvc2015_64
-  BOOST_ROOT: C:\Libraries\boost_1_63_0
-  BOOST_LIB: C:\Libraries\boost_1_63_0\lib64-msvc-14.0
+  QTDIR: C:\Qt\5.9.5\msvc2017_64
+  BOOST_ROOT: C:\Libraries\boost_1_64_0
+  BOOST_LIB: C:\Libraries\boost_1_64_0\lib64-msvc-14.1
 
 build_script:
   # It's impossible to use the .sln file to build, because client_leapmotion fails to build,
